@@ -1,8 +1,10 @@
 //Set global variables
 var exports = module.exports = {};
+var events = require('events');
 var server;
 var port;
 var ips = [];
+var climber = new events.EventEmitter();
 
 //Set server var to be the udp4 server from server.js and get the port
 exports.init = function(serverParam, portParam) {
@@ -14,6 +16,9 @@ exports.init = function(serverParam, portParam) {
   }
 }
 
+//export the EventEmitter so handlingRequest.js can communicate with main.js
+exports.climber = climber;
+
 //handles the messages
 exports.handle = function(msg, addr) {
   if(server == undefined){
@@ -21,16 +26,18 @@ exports.handle = function(msg, addr) {
     return;
   }
 
+  //Parse the string msg into an object
   var obj = JSON.parse(msg);
 
   if(obj.msg !== undefined){
-    console.log(obj.msg);
+    //sends the message to main.js so it can be sent to the BrowserWindow using ipc
+    climber.emit('incoming_msg', obj);
   }
   if(obj.backend !== undefined){
     switch(obj.backend){
       case "init_knocking":
           //When a computer "knocks" on the server port
-          console.log("knocking initiated");
+          console.log(addr + " Knocked");
           ips[ips.length] = addr;
           var objSent = {};
           objSent.backend = "knocking_accepted";

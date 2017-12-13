@@ -1,6 +1,7 @@
 var utilities = require('./utilities.js');
 var serverHandle = require('./handlingRequest.js');
 var udp = require('dgram');
+var events = require('events');
 
 //Set global variables
 var port;
@@ -8,6 +9,13 @@ var myIp = utilities.getLocalIp();
 var ipScheme = utilities.getIpScheme(myIp);
 var server;
 var exports = module.exports = {};
+
+//transmit handlingRequest.js data to main.js
+var climber = new events.EventEmitter();
+exports.climber = climber;
+serverHandle.climber.on('incoming_msg', function(data){
+  climber.emit('incoming_msg', data);
+});
 
 //Init funtion
 exports.init = function(portParam) {
@@ -70,9 +78,12 @@ exports.scanIps = function() {
 
 //Function to send messages to everybody
 exports.broadcast = function(msg){
+  //Create an object to pass data
   var obj = {};
   obj.sender = myIp;
   obj.msg = msg;
+
+  //stringify it
   var finalMsg = JSON.stringify(obj);
   var ips = serverHandle.getIps();
   for (i = 0; i < ips.length - 1; i++){

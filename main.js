@@ -25,9 +25,15 @@ function createWindow () {
   })
 }
 
-ipcMain.on('msg', function(event,arg){
+//When a message is sent from the browser window
+ipcMain.on('msg_sent', function(event,arg){
     console.log(arg);
     udpServ.broadcast(arg);
+});
+
+//When a message is sent from handlingRequest.js
+udpServ.climber.on('incoming_msg', function(data){
+  win.webContents.send('incoming_msg', data);
 });
 
 //When everything's loaded

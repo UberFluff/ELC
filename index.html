@@ -6,18 +6,30 @@
   </head>
   <body>
     <input type="text" id="textInput"/><button onclick="sendMsg();">Send</button>
+    <p id="textMsg"></p>
     <script type="text/javascript">
         //Global variables
         var {ipcRenderer} = require('electron');
         var textForm = document.getElementById("textInput");
+        var textMsg = document.getElementById("textMsg");
+
+        //When a message is coming from the handlingRequest.js
+        ipcRenderer.on('incoming_msg', function(event,arg){
+            var temp = textMsg.innerHTML;
+            textMsg.innerHTML = temp + "<br/>" + arg.sender + " : " + arg.msg;
+        });
+
 
         //Get text from the input
         function sendMsg(){
           var text = textForm.value;
+          
+          //clean the input
+          textForm.value = "";
           if(text == "" || text == undefined){
             return;
           }
-          ipcRenderer.send('msg', text);
+          ipcRenderer.send('msg_sent', text);
         }
     </script>
   </body>
