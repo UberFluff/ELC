@@ -1,0 +1,12 @@
+{
+  "name"    : "LanChat",
+  "version" : "0.1.0",
+  "main"    : "main.js",
+  "dependencies" : {
+    "dgram" : "latest",
+    "electron" : "latest"
+  },
+  "scripts" : {
+    "start" : "electron ."
+  }
+}
