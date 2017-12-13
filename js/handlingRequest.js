@@ -1,11 +1,14 @@
 //Set global variables
 var exports = module.exports = {};
 var server;
+var port;
 var ips = [];
-//Set server var to be the udp4 server from server.js
-exports.init = function(serverParam) {
+
+//Set server var to be the udp4 server from server.js and get the port
+exports.init = function(serverParam, portParam) {
   try {
     server = serverParam;
+    port = portParam;
   } catch (err) {
     console.log(err);
   }
@@ -26,10 +29,12 @@ exports.handle = function(msg, addr) {
           server.send("knocking_accepted",2222,addr);
           break;
       case "knocking_accepted":
+          //Add a knocking computer to the ip list
           ips[ips.length] = addr;
           console.log("added " + addr + " to the ip list");
           break;
       case "test":
+          //Just for me
           console.log(this.getIps());
           break;
   }

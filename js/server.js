@@ -3,14 +3,15 @@ var serverHandle = require('./handlingRequest.js');
 var udp = require('dgram');
 
 //Set global variables
+var port;
 var myIp = utilities.getLocalIp();
 var ipScheme = utilities.getIpScheme(myIp);
 var server;
 var exports = module.exports = {};
 
 //Init funtion
-exports.init = function() {
-
+exports.init = function(portParam) {
+  port = portParam;
   //Create server
   server = udp.createSocket('udp4');
 
@@ -40,8 +41,9 @@ exports.init = function() {
   });
 
   //Last config, bind server to a port and initiate the serverHandle (handlingRequest.js)
-  server.bind(2222);
-  serverHandle.init(server);
+  server.bind(port);
+  serverHandle.init(server, port);
+  this.scanIps();
 }
 
 //Sends a packet to the whole network "knocking" on port 2222
@@ -55,11 +57,19 @@ exports.scanIps = function() {
   for (i = 0; i < 255; i++) {
     var temp = ipScheme + i;
     var msg = "init_knocking";
-    server.send(msg, 2222, temp, function(error) {
+    server.send(msg, port, temp, function(error) {
       if (error) {
         console.log(error);
         client.close();
       }
     });
+  }
+}
+
+//Function to send messages to everybody
+exports.broadcast = function(msg){
+  var ips = serverHandle.getIps();
+  for (i = 0; i < ips.length - 1; i++){
+    server.send(msg, port, ips[i]);
   }
 }
