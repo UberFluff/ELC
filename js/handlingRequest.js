@@ -21,12 +21,21 @@ exports.handle = function(msg, addr) {
     return;
   }
 
-  switch(msg){
+  var obj = JSON.parse(msg);
+
+  if(obj.msg !== undefined){
+    console.log(obj.msg);
+  }
+  if(obj.backend !== undefined){
+    switch(obj.backend){
       case "init_knocking":
           //When a computer "knocks" on the server port
           console.log("knocking initiated");
           ips[ips.length] = addr;
-          server.send("knocking_accepted",2222,addr);
+          var objSent = {};
+          objSent.backend = "knocking_accepted";
+          var finalMsg = JSON.stringify(objSent);
+          server.send(finalMsg,2222,addr);
           break;
       case "knocking_accepted":
           //Add a knocking computer to the ip list
@@ -37,6 +46,7 @@ exports.handle = function(msg, addr) {
           //Just for me
           console.log(this.getIps());
           break;
+    }
   }
 }
 

@@ -56,8 +56,10 @@ exports.scanIps = function() {
   //Test the 255 possibilities of Ip Scheme (Ex: 192.168.0.x)
   for (i = 0; i < 255; i++) {
     var temp = ipScheme + i;
-    var msg = "init_knocking";
-    server.send(msg, port, temp, function(error) {
+    var objSent = {};
+    objSent.backend = "init_knocking";
+    var finalMsg = JSON.stringify(objSent);
+    server.send(finalMsg, port, temp, function(error) {
       if (error) {
         console.log(error);
         client.close();
@@ -68,8 +70,12 @@ exports.scanIps = function() {
 
 //Function to send messages to everybody
 exports.broadcast = function(msg){
+  var obj = {};
+  obj.sender = myIp;
+  obj.msg = msg;
+  var finalMsg = JSON.stringify(obj);
   var ips = serverHandle.getIps();
   for (i = 0; i < ips.length - 1; i++){
-    server.send(msg, port, ips[i]);
+    server.send(finalMsg, port, ips[i]);
   }
 }
