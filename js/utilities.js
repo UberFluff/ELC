@@ -5,9 +5,16 @@ var ifaces = os.networkInterfaces();
 var exports = module.exports = {};
 
 //Get the first internet interface local IP
-exports.getLocalIp = function(){
-    var name = Object.keys(ifaces)[0];
-    return ifaces[name][1].address;
+exports.getLocalIp = function(callback){
+    let ip;
+    Object.keys(ifaces).forEach(function(key){
+      for(i = 0; i < ifaces[key].length; i++){
+        if(ifaces[key][i].address.substr(0,8) == "192.168."){
+          ip = ifaces[key][i].address;
+        }
+      }
+    });
+    callback(ip);
 }
 
 //As the name says get the Ip scheme (ex: 192.168.0.x)

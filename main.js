@@ -27,8 +27,9 @@ function createWindow () {
 
 //When a message is sent from the browser window
 ipcMain.on('msg_sent', function(event,arg){
-    console.log(arg);
-    udpServ.broadcast(arg);
+    var obj = {};
+    obj.msg = arg;
+    udpServ.broadcast(obj);
 });
 
 //When a message is sent from handlingRequest.js

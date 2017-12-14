@@ -16,14 +16,14 @@
         //When a message is coming from the handlingRequest.js
         ipcRenderer.on('incoming_msg', function(event,arg){
             var temp = textMsg.innerHTML;
-            textMsg.innerHTML = temp + "<br/>" + arg.sender + " : " + arg.msg;
+            textMsg.innerHTML = temp + "<br/>" + arg.name + " : " + arg.msg;
         });
 
 
         //Get text from the input
         function sendMsg(){
           var text = textForm.value;
-          
+
           //clean the input
           textForm.value = "";
           if(text == "" || text == undefined){

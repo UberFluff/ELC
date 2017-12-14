@@ -5,7 +5,10 @@ var events = require('events');
 
 //Set global variables
 var port;
-var myIp = utilities.getLocalIp();
+let myIp;
+utilities.getLocalIp(function(data){
+  myIp = data;
+});
 var ipScheme = utilities.getIpScheme(myIp);
 var server;
 var exports = module.exports = {};
@@ -51,6 +54,7 @@ exports.init = function(portParam) {
   //Last config, bind server to a port and initiate the serverHandle (handlingRequest.js)
   server.bind(port);
   serverHandle.init(server, port);
+  serverHandle.setAlias("Anonymous");
   this.scanIps();
 }
 
@@ -66,27 +70,33 @@ exports.scanIps = function() {
     var temp = ipScheme + i;
     var objSent = {};
     objSent.backend = "init_knocking";
+    objSent.alias = serverHandle.getAlias();
     var finalMsg = JSON.stringify(objSent);
     server.send(finalMsg, port, temp, function(error) {
       if (error) {
         console.log(error);
-        client.close();
+        return;
       }
     });
   }
 }
 
 //Function to send messages to everybody
-exports.broadcast = function(msg){
-  //Create an object to pass data
-  var obj = {};
-  obj.sender = myIp;
-  obj.msg = msg;
-
+exports.broadcast = function(obj){
   //stringify it
   var finalMsg = JSON.stringify(obj);
   var ips = serverHandle.getIps();
   for (i = 0; i < ips.length - 1; i++){
-    server.send(finalMsg, port, ips[i]);
+    server.send(finalMsg, port, ips[i].addr);
   }
+}
+
+//Set pseudo of the client
+exports.setAlias = function(name){
+  serverHandle.setAlias(name);
+}
+
+//Get pseudo of the client
+exports.getAlias = function(){
+  return serverHandle.getAlias();
 }
